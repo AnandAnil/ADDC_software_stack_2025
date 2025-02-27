@@ -61,7 +61,7 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisSize: MainAxisSize.max,
           children: [
-            Text("Hello"),
+            // Text("Hello"),
             Expanded(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,

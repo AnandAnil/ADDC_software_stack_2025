@@ -1,3 +1,4 @@
+import 'package:drone_telemetry_and_controls/spin_drone_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -83,7 +84,8 @@ class _MyHomePageState extends State<MyHomePage> {
       currentlocation = LatLng(position.latitude, position.longitude);
     });
     if (currentlocation != null) {
-      double targetZoom = mapController.camera.zoom <= 5.0? 17.5:mapController.camera.zoom;
+      double targetZoom =
+          mapController.camera.zoom <= 5.0 ? 17.5 : mapController.camera.zoom;
       mapController.move(currentlocation!, targetZoom);
     }
   }
@@ -131,16 +133,16 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: GestureDetector(
                   onTap: () {
                     String _convertToDMS(double coordinate, bool isLatitude) {
-                      String direction = isLatitude 
+                      String direction = isLatitude
                           ? (coordinate >= 0 ? "N" : "S")
                           : (coordinate >= 0 ? "E" : "W");
-                          
+
                       coordinate = coordinate.abs();
                       int degrees = coordinate.floor();
                       double minutesDecimal = (coordinate - degrees) * 60;
                       int minutes = minutesDecimal.floor();
                       int seconds = ((minutesDecimal - minutes) * 60).round();
-                      
+
                       return "$degrees° $minutes' $seconds\" $direction";
                     }
 
@@ -153,8 +155,10 @@ class _MyHomePageState extends State<MyHomePage> {
                             mainAxisSize: MainAxisSize.min,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('Lat: ${_convertToDMS(currentlocation!.latitude, true)}'),
-                              Text('Lon: ${_convertToDMS(currentlocation!.longitude, false)}'),
+                              Text(
+                                  'Lat: ${_convertToDMS(currentlocation!.latitude, true)}'),
+                              Text(
+                                  'Lon: ${_convertToDMS(currentlocation!.longitude, false)}'),
                             ],
                           ),
                           actions: [
@@ -168,9 +172,9 @@ class _MyHomePageState extends State<MyHomePage> {
                     );
                   },
                   child: const Icon(
-                    Icons.location_pin,
-                    color: Colors.red,
-                    size: 40,
+                    SpinDrone.spinDrone,
+                    color: Color.fromARGB(255, 255, 0, 255),
+                    size: 38,
                   ),
                 ),
               )

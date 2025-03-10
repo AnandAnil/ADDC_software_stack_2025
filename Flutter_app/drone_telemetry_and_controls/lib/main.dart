@@ -77,9 +77,14 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  void _goToCurrentLocation() {
+  void _goToCurrentLocation() async {
+    Position position = await Geolocator.getCurrentPosition();
+    setState(() {
+      currentlocation = LatLng(position.latitude, position.longitude);
+    });
     if (currentlocation != null) {
-      mapController.move(currentlocation!, 17.5);
+      double targetZoom = mapController.camera.zoom <= 5.0? 17.5:mapController.camera.zoom;
+      mapController.move(currentlocation!, targetZoom);
     }
   }
 
@@ -112,6 +117,7 @@ class _MyHomePageState extends State<MyHomePage> {
       options: MapOptions(
         initialCenter: LatLng(1.2878, 103.8666),
         initialZoom: 5,
+        minZoom: 2,
       ),
       children: [
         openStreetMapTileLayer,
@@ -122,10 +128,50 @@ class _MyHomePageState extends State<MyHomePage> {
                 point: currentlocation!,
                 width: 80,
                 height: 80,
-                child: const Icon(
-                  Icons.location_pin,
-                  color: Colors.red,
-                  size: 40,
+                child: GestureDetector(
+                  onTap: () {
+                    String _convertToDMS(double coordinate, bool isLatitude) {
+                      String direction = isLatitude 
+                          ? (coordinate >= 0 ? "N" : "S")
+                          : (coordinate >= 0 ? "E" : "W");
+                          
+                      coordinate = coordinate.abs();
+                      int degrees = coordinate.floor();
+                      double minutesDecimal = (coordinate - degrees) * 60;
+                      int minutes = minutesDecimal.floor();
+                      int seconds = ((minutesDecimal - minutes) * 60).round();
+                      
+                      return "$degrees° $minutes' $seconds\" $direction";
+                    }
+
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: const Text('Current Location'),
+                          content: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Lat: ${_convertToDMS(currentlocation!.latitude, true)}'),
+                              Text('Lon: ${_convertToDMS(currentlocation!.longitude, false)}'),
+                            ],
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text('Close'),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                  child: const Icon(
+                    Icons.location_pin,
+                    color: Colors.red,
+                    size: 40,
+                  ),
                 ),
               )
             ],

@@ -37,30 +37,29 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-  
-void clearDatabase() {
-  showDialog(
-    context: context,
-    builder: (context) => AlertDialog(
-      title: Text('Clear Database'),
-      content: Text('Are you sure you want to clear all notes?'),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: Text('Cancel'),
-        ),
-        TextButton(
-          onPressed: () {
-            Navigator.pop(context);
-            firestoreService.deleteAllNotes();
-          },
-          child: Text('Clear'),
-        ),
-      ],
-    ),
-  );
-}
 
+  void clearDatabase() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Clear Database'),
+        content: Text('Are you sure you want to clear all notes?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              firestoreService.deleteAllNotes();
+            },
+            child: Text('Clear'),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {

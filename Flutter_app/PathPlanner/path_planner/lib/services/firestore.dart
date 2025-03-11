@@ -5,10 +5,12 @@ class FirestoreService {
       FirebaseFirestore.instance.collection('Notes');
 
   Future<void> addNote(String note) {
-    return notes.add({
-      'note': note,
-      'timestamp': Timestamp.now(),
-    });
+    return notes.add(
+      {
+        'note': note,
+        'timestamp': Timestamp.now(),
+      },
+    );
   }
 
   Stream<QuerySnapshot> getNoteStream() {
@@ -18,10 +20,12 @@ class FirestoreService {
   }
 
   Future<void> updateNote(String docID, String newNote) {
-    return notes.doc(docID).update({
-      'note': newNote,
-      'timestamp': Timestamp.now(),
-    });
+    return notes.doc(docID).update(
+      {
+        'note': newNote,
+        'timestamp': Timestamp.now(),
+      },
+    );
   }
 
   Future<void> deleteNote(String docID) {
@@ -30,11 +34,13 @@ class FirestoreService {
 
   Future<void> deleteAllNotes() {
     WriteBatch batch = FirebaseFirestore.instance.batch();
-    return notes.get().then((querySnapshot) {
-      for (var doc in querySnapshot.docs) {
-        batch.delete(doc.reference);
-      }
-      return batch.commit();
-    });
+    return notes.get().then(
+      (querySnapshot) {
+        for (var doc in querySnapshot.docs) {
+          batch.delete(doc.reference);
+        }
+        return batch.commit();
+      },
+    );
   }
 }

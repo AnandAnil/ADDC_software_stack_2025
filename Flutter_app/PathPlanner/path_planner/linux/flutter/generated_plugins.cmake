@@ -3,6 +3,8 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+  dynamic_color
+  system_theme
 )
 
 list(APPEND FLUTTER_FFI_PLUGIN_LIST

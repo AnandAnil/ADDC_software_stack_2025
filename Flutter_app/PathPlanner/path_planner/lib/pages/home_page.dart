@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:path_planner/services/firestore.dart';
+import 'package:latlong2/latlong.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -10,8 +12,26 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  LatLng? currentlocation;
   final FirestoreService firestoreService = FirestoreService();
   final TextEditingController textController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _getCurrentLocation();
+  }
+
+  Future<void> _getCurrentLocation() async {
+    LocationPermission permission = await Geolocator.requestPermission();
+    if (permission == LocationPermission.denied) {
+      return;
+    }
+    Position position = await Geolocator.getCurrentPosition();
+    setState(() {
+      currentlocation = LatLng(position.latitude, position.longitude);
+    });
+  }
 
   void openNoteBox({String? docID}) {
     showDialog(
@@ -22,20 +42,78 @@ class _HomePageState extends State<HomePage> {
         ),
         actions: [
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
+              Position position = await Geolocator.getCurrentPosition();
               if (docID == null) {
-                firestoreService.addNote(textController.text);
+                firestoreService.addNote(
+                  textController.text,
+                  position.latitude,
+                  position.longitude,
+                );
               } else {
                 firestoreService.updateNote(docID, textController.text);
               }
               textController.clear();
               Navigator.pop(context);
             },
-            child: Text('Add Note'),
+            child: Text('Add Location'),
           ),
         ],
       ),
     );
+  }
+
+  void showDeleteDialog({String? docID}) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(docID == null ? 'Clear Database' : 'Delete Entry'),
+        content: Text(docID == null
+            ? 'Are you sure you want to clear all notes?'
+            : 'Are you sure you want to delete this entry?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              docID == null
+                  ? firestoreService.deleteAllNotes()
+                  : firestoreService.deleteNote(docID);
+            },
+            child: Text('Delete'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String convertToDMS(double coordinate, bool isLatitude) {
+    String direction = isLatitude
+        ? (coordinate >= 0 ? "N" : "S")
+        : (coordinate >= 0 ? "E" : "W");
+
+    coordinate = coordinate.abs();
+    int degrees = coordinate.floor();
+    double minutesDecimal = (coordinate - degrees) * 60;
+    int minutes = minutesDecimal.floor();
+    int seconds = ((minutesDecimal - minutes) * 60).round();
+
+    if (seconds == 60) {
+      minutes += 1;
+      seconds = 0;
+      if (minutes == 60) {
+        degrees += 1;
+        minutes = 0;
+      }
+    }
+    String degreesStr = degrees.toString().padLeft(2, '0');
+    String minutesStr = minutes.toString().padLeft(2, '0');
+    String secondsStr = seconds.toString().padLeft(2, '0');
+
+    return "$degreesStr° $minutesStr' $secondsStr\" $direction";
   }
 
   void clearDatabase() {
@@ -65,7 +143,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('GPS Mapper'),
+        title: Text('Location chart'),
       ),
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
@@ -76,7 +154,7 @@ class _HomePageState extends State<HomePage> {
             child: Icon(Icons.add),
           ),
           FloatingActionButton(
-            onPressed: clearDatabase,
+            onPressed: showDeleteDialog,
             child: Icon(Icons.delete),
           ),
         ],
@@ -96,6 +174,10 @@ class _HomePageState extends State<HomePage> {
                 String noteText = data['note'];
                 return ListTile(
                   title: Text(noteText),
+                  subtitle: Text(
+                    'lat: ${convertToDMS(data['latitude'], true)}\nlng: ${convertToDMS(data['longitude'], false)}',
+                    style: TextStyle(fontFamily: 'monospace'),
+                  ),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -104,7 +186,7 @@ class _HomePageState extends State<HomePage> {
                         icon: Icon(Icons.settings_outlined),
                       ),
                       IconButton(
-                        onPressed: () => firestoreService.deleteNote(docID),
+                        onPressed: () => showDeleteDialog(docID: docID),
                         icon: Icon(Icons.delete_outline),
                       ),
                     ],

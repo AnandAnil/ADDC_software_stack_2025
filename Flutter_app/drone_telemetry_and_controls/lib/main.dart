@@ -4,7 +4,6 @@ import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:flutter/services.dart';
 
 void main() {
   runApp(const MyApp());
@@ -45,21 +44,6 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   LatLng? currentlocation;
   final MapController mapController = MapController();
-  int _counter = 0;
-
-  void _incrementCounter() {
-    print("increment button pressed");
-    setState(() {
-      _counter++;
-    });
-  }
-
-  void _refresh() {
-    print("reset button pressed");
-    setState(() {
-      _counter = 0;
-    });
-  }
 
   @override
   void initState() {
@@ -104,7 +88,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           const SizedBox(height: 16),
           FloatingActionButton(
-            onPressed: _refresh,
+            onPressed: () {},
             tooltip: "decrement",
             child: Icon(Icons.refresh),
           )

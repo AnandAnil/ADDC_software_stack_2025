@@ -4,10 +4,12 @@ class FirestoreService {
   final CollectionReference notes =
       FirebaseFirestore.instance.collection('Notes');
 
-  Future<void> addNote(String note) {
+  Future<void> addNote(String note, double latitude, double longitude) {
     return notes.add(
       {
         'note': note,
+        'latitude': latitude,
+        'longitude': longitude,
         'timestamp': Timestamp.now(),
       },
     );

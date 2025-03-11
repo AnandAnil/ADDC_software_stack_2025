@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "5004017647",
+    "project_id": "pathplanner-48498",
+    "storage_bucket": "pathplanner-48498.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:5004017647:android:098eef1079d8bb2954001a",
+        "android_client_info": {
+          "package_name": "com.example.path_planner"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBgcG7B_y_u5uYqPtdklc_rW5mBI4tl05A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -17,15 +17,14 @@ class FirestoreService {
 
   Stream<QuerySnapshot> getNoteStream() {
     final notesStream =
-        notes.orderBy('timestamp', descending: true).snapshots();
+        notes.orderBy('timestamp', descending: false).snapshots();
     return notesStream;
   }
 
   Future<void> updateNote(String docID, String newNote) {
     return notes.doc(docID).update(
       {
-        'note': newNote,
-        'timestamp': Timestamp.now(),
+        'note': newNote
       },
     );
   }

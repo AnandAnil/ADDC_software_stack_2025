@@ -37,14 +37,18 @@ class _HomePageState extends State<HomePage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
+        title: Text(docID == null ? 'Add New Location' : 'Edit Location Name'),
         content: TextField(
+          autofocus: true,
+
           controller: textController,
         ),
         actions: [
-          ElevatedButton(
+          TextButton(
+            
             onPressed: () async {
-              Position position = await Geolocator.getCurrentPosition();
               if (docID == null) {
+                Position position = await Geolocator.getCurrentPosition();
                 firestoreService.addNote(
                   textController.text,
                   position.latitude,

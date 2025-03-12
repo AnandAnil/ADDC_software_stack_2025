@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:path_planner/services/firestore.dart';
 import 'package:latlong2/latlong.dart';
@@ -40,12 +41,10 @@ class _HomePageState extends State<HomePage> {
         title: Text(docID == null ? 'Add New Location' : 'Edit Location Name'),
         content: TextField(
           autofocus: true,
-
           controller: textController,
         ),
         actions: [
           TextButton(
-            
             onPressed: () async {
               if (docID == null) {
                 Position position = await Geolocator.getCurrentPosition();
@@ -92,32 +91,6 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
     );
-  }
-
-  String convertToDMS(double coordinate, bool isLatitude) {
-    String direction = isLatitude
-        ? (coordinate >= 0 ? "N" : "S")
-        : (coordinate >= 0 ? "E" : "W");
-
-    coordinate = coordinate.abs();
-    int degrees = coordinate.floor();
-    double minutesDecimal = (coordinate - degrees) * 60;
-    int minutes = minutesDecimal.floor();
-    int seconds = ((minutesDecimal - minutes) * 60).round();
-
-    if (seconds == 60) {
-      minutes += 1;
-      seconds = 0;
-      if (minutes == 60) {
-        degrees += 1;
-        minutes = 0;
-      }
-    }
-    String degreesStr = degrees.toString().padLeft(2, '0');
-    String minutesStr = minutes.toString().padLeft(2, '0');
-    String secondsStr = seconds.toString().padLeft(2, '0');
-
-    return "$degreesStr° $minutesStr' $secondsStr\" $direction";
   }
 
   void clearDatabase() {
@@ -179,12 +152,28 @@ class _HomePageState extends State<HomePage> {
                 return ListTile(
                   title: Text(noteText),
                   subtitle: Text(
-                    'lat: ${convertToDMS(data['latitude'], true)}\nlng: ${convertToDMS(data['longitude'], false)}',
+                    'lat: ${data['latitude']}\nlng: ${data['longitude']}',
                     style: TextStyle(fontFamily: 'monospace'),
                   ),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
+                      IconButton(
+                        onPressed: () {
+                          Clipboard.setData(
+                            ClipboardData(
+                              text: '${data['latitude']}, ${data['longitude']}',
+                            ),
+                          );
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Copied to clipboard'),
+                              duration: Duration(seconds: 2),
+                            ),
+                          );
+                        },
+                        icon: Icon(Icons.copy_outlined),
+                      ),
                       IconButton(
                         onPressed: () => openNoteBox(docID: docID),
                         icon: Icon(Icons.settings_outlined),

@@ -74,6 +74,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: content(),
@@ -116,7 +117,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 height: 80,
                 child: GestureDetector(
                   onTap: () {
-                    String _convertToDMS(double coordinate, bool isLatitude) {
+                    String convertToDMS(double coordinate, bool isLatitude) {
                       String direction = isLatitude
                           ? (coordinate >= 0 ? "N" : "S")
                           : (coordinate >= 0 ? "E" : "W");
@@ -140,9 +141,9 @@ class _MyHomePageState extends State<MyHomePage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                  'Lat: ${_convertToDMS(currentlocation!.latitude, true)}'),
+                                  'Lat: ${convertToDMS(currentlocation!.latitude, true)}'),
                               Text(
-                                  'Lon: ${_convertToDMS(currentlocation!.longitude, false)}'),
+                                  'Lon: ${convertToDMS(currentlocation!.longitude, false)}'),
                             ],
                           ),
                           actions: [

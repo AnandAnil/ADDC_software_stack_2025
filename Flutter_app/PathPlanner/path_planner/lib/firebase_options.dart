@@ -25,15 +25,9 @@ class DefaultFirebaseOptions {
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for macos - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return macos;
       case TargetPlatform.windows:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for windows - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return windows;
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
@@ -71,4 +65,23 @@ class DefaultFirebaseOptions {
     storageBucket: 'pathplanner-48498.firebasestorage.app',
     iosBundleId: 'com.example.pathPlanner',
   );
+
+  static const FirebaseOptions macos = FirebaseOptions(
+    apiKey: 'AIzaSyDDgC4yVoPpaDe2lyqWTRTB6Hw_ZGhd06E',
+    appId: '1:5004017647:ios:52fb3275977fbf6554001a',
+    messagingSenderId: '5004017647',
+    projectId: 'pathplanner-48498',
+    storageBucket: 'pathplanner-48498.firebasestorage.app',
+    iosBundleId: 'com.example.pathPlanner',
+  );
+
+  static const FirebaseOptions windows = FirebaseOptions(
+    apiKey: 'AIzaSyAGOA1uB3soAFia9eprK-qUi9Lgwd6RVeQ',
+    appId: '1:5004017647:web:d67b2fd188e27cc654001a',
+    messagingSenderId: '5004017647',
+    projectId: 'pathplanner-48498',
+    authDomain: 'pathplanner-48498.firebaseapp.com',
+    storageBucket: 'pathplanner-48498.firebasestorage.app',
+  );
+
 }

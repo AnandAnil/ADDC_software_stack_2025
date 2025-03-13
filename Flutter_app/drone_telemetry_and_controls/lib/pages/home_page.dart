@@ -1,11 +1,9 @@
-import 'package:drone_telemetry_and_controls/firebase_options.dart';
 import 'package:drone_telemetry_and_controls/spin_drone_icons.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'package:drone_telemetry_and_controls/services/firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
-
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -16,12 +14,40 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   LatLng? currentlocation;
+  final FirestoreService firestoreService = FirestoreService();
   final MapController mapController = MapController();
 
   @override
   void initState() {
     super.initState();
     _getCurrentLocation();
+  }
+
+  void showDeleteDialog({String? docID}) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(docID == null ? 'Clear Database' : 'Delete Entry'),
+        content: Text(docID == null
+            ? 'Are you sure you want to clear all notes?'
+            : 'Are you sure you want to delete this entry?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              docID == null
+                  ? firestoreService.deleteAllNotes()
+                  : firestoreService.deleteNote(docID);
+            },
+            child: Text('Delete'),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _getCurrentLocation() async {
@@ -62,9 +88,9 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           const SizedBox(height: 16),
           FloatingActionButton(
-            onPressed: () {},
+            onPressed: showDeleteDialog,
             tooltip: "decrement",
-            child: Icon(Icons.refresh),
+            child: Icon(Icons.delete),
           )
         ],
       ),

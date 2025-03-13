@@ -1,13 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:latlong2/latlong.dart';
 
 class FirestoreService {
   final CollectionReference notes =
       FirebaseFirestore.instance.collection('Telemetry Locations');
 
-  Future<void> addNote(String note, double latitude, double longitude) {
+  Future<void> addNote(double latitude, double longitude) {
     return notes.add(
       {
-        'note': note,
         'latitude': latitude,
         'longitude': longitude,
         'timestamp': Timestamp.now(),
@@ -23,9 +23,7 @@ class FirestoreService {
 
   Future<void> updateNote(String docID, String newNote) {
     return notes.doc(docID).update(
-      {
-        'note': newNote
-      },
+      {'note': newNote},
     );
   }
 

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drone_telemetry_and_controls/spin_drone_icons.dart';
 import 'package:drone_telemetry_and_controls/services/firestore.dart';
 import 'package:flutter/material.dart';
@@ -78,15 +79,23 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       body: content(),
       floatingActionButton: Column(
+        spacing: 16,
         mainAxisAlignment: MainAxisAlignment.end,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
+          FloatingActionButton(
+            onPressed: () async {
+              Position position = await Geolocator.getCurrentPosition();
+              firestoreService.addNote(position.latitude, position.longitude);
+            },
+            tooltip: 'Add Location',
+            child: Icon(Icons.add_rounded),
+          ),
           FloatingActionButton(
             onPressed: _goToCurrentLocation,
             tooltip: 'My Location',
             child: Icon(Icons.location_pin),
           ),
-          const SizedBox(height: 16),
           FloatingActionButton(
             onPressed: showDeleteDialog,
             tooltip: "decrement",
@@ -107,6 +116,71 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       children: [
         openStreetMapTileLayer,
+        StreamBuilder<QuerySnapshot>(
+          stream: firestoreService.getNoteStream(),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) return const SizedBox();
+            List<LatLng> points = snapshot.data!.docs.map((doc) {
+              final data = doc.data() as Map<String, dynamic>;
+              return LatLng(data['latitude'], data['longitude']);
+            }).toList();
+
+            return Stack(
+              children: [
+                if (points.length >= 2)
+                  PolylineLayer(
+                    polylines: [
+                      Polyline(
+                        points: points,
+                        color: Colors.blue,
+                        strokeWidth: 5,
+                      ),
+                    ],
+                  ),
+                MarkerLayer(
+                  markers: points.asMap().entries.map(
+                    (entry) {
+                      int idx = entry.key;
+                      LatLng point = entry.value;
+                      bool isLastPoint = idx == points.length - 1;
+
+                      return Marker(
+                        point: point,
+                        width: isLastPoint ? 40 : 40,
+                        height: isLastPoint ? 40 : 40,
+                        child: GestureDetector(
+                          onTap: () {
+                            final data = snapshot.data!.docs[idx].data()
+                                as Map<String, dynamic>;
+                            final Timestamp timestamp = data['timestamp'];
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                    'Time: ${timestamp.toDate().hour.toString().padLeft(2, '0')}:${timestamp.toDate().minute.toString().padLeft(2, '0')}:${timestamp.toDate().second.toString().padLeft(2, '0')}, Date: ${timestamp.toDate().day.toString().padLeft(2, '0')}/${timestamp.toDate().month.toString().padLeft(2, '0')}/${timestamp.toDate().year.toString().padLeft(4, '0')}'),
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
+                          },
+                          child: isLastPoint
+                              ? const Icon(
+                                  SpinDrone.spinDrone,
+                                  color: Colors.red,
+                                  size: 40,
+                                )
+                              : const Icon(
+                                  Icons.adjust_rounded,
+                                  color: Colors.orange,
+                                  size: 30,
+                                ),
+                        ),
+                      );
+                    },
+                  ).toList(),
+                ),
+              ],
+            );
+          },
+        ),
         if (currentlocation != null)
           MarkerLayer(
             markers: [

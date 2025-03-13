@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1048761680559",
+    "project_id": "dronetrack-211a2",
+    "storage_bucket": "dronetrack-211a2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1048761680559:android:cfd64830d4b5c0b0d98a5a",
+        "android_client_info": {
+          "package_name": "com.example.drone_telemetry_and_controls"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB6Zuw2LDwaqb89Faapgq5vHUArJPe73pM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

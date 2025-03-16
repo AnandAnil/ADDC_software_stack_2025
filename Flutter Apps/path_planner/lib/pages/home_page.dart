@@ -29,9 +29,11 @@ class _HomePageState extends State<HomePage> {
       return;
     }
     Position position = await Geolocator.getCurrentPosition();
-    setState(() {
-      currentlocation = LatLng(position.latitude, position.longitude);
-    });
+    setState(
+      () {
+        currentlocation = LatLng(position.latitude, position.longitude);
+      },
+    );
   }
 
   void openNoteBox({String? docID}) {

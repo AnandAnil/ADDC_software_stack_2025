@@ -122,7 +122,7 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: Text('Location chart'),
       ),
-      floatingActionButton: Column(
+      floatingActionButton: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         spacing: 16,
         children: [
@@ -142,6 +142,7 @@ class _HomePageState extends State<HomePage> {
           if (snapshot.hasData) {
             List notesList = snapshot.data!.docs;
             return ListView.builder(
+              padding: EdgeInsets.only(bottom: 80),
               itemCount: notesList.length,
               itemBuilder: (context, index) {
                 DocumentSnapshot document = notesList[index];

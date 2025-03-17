@@ -156,7 +156,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
     return FlutterMap(
       mapController: mapController,
       options: MapOptions(
-        initialCenter: LatLng(1.2878, 103.8666),
+        initialCenter: LatLng(10.554652,76.2245597),
         initialZoom: 5,
         minZoom: 2,
       ),

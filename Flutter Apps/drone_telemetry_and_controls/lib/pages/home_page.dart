@@ -13,15 +13,61 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
   LatLng? currentlocation;
   final FirestoreService firestoreService = FirestoreService();
   final MapController mapController = MapController();
-
+  LatLng? lastFocusedPoint;
   @override
   void initState() {
     super.initState();
     _getCurrentLocation();
+  }
+
+  // Add this method for smooth map animations
+  void animatedMapMove(LatLng destLocation, double destZoom) {
+    // Skip if we're already at this location
+    if (lastFocusedPoint != null &&
+        lastFocusedPoint!.latitude == destLocation.latitude &&
+        lastFocusedPoint!.longitude == destLocation.longitude) {
+      return;
+    }
+
+    // Update our tracking variable
+    lastFocusedPoint = destLocation;
+
+    // Create controller for animation
+    final latTween = Tween<double>(
+        begin: mapController.camera.center.latitude,
+        end: destLocation.latitude);
+    final lngTween = Tween<double>(
+        begin: mapController.camera.center.longitude,
+        end: destLocation.longitude);
+    final zoomTween =
+        Tween<double>(begin: mapController.camera.zoom, end: destZoom);
+
+    // Create animation controller
+    final controller = AnimationController(
+        duration: const Duration(milliseconds: 500), vsync: this);
+    final Animation<double> animation =
+        CurvedAnimation(parent: controller, curve: Curves.fastOutSlowIn);
+
+    controller.addListener(() {
+      mapController.move(
+        LatLng(latTween.evaluate(animation), lngTween.evaluate(animation)),
+        zoomTween.evaluate(animation),
+      );
+    });
+
+    animation.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        controller.dispose();
+      } else if (status == AnimationStatus.dismissed) {
+        controller.dispose();
+      }
+    });
+
+    controller.forward();
   }
 
   void showDeleteDialog({String? docID}) {
@@ -70,7 +116,7 @@ class _MyHomePageState extends State<MyHomePage> {
     if (currentlocation != null) {
       double targetZoom =
           mapController.camera.zoom <= 5.0 ? 17.5 : mapController.camera.zoom;
-      mapController.move(currentlocation!, targetZoom);
+      animatedMapMove(currentlocation!, targetZoom);
     }
   }
 
@@ -124,7 +170,14 @@ class _MyHomePageState extends State<MyHomePage> {
               final data = doc.data() as Map<String, dynamic>;
               return LatLng(data['latitude'], data['longitude']);
             }).toList();
-
+            // Auto-focus on the last point when new data arrives
+            if (points.isNotEmpty) {
+              // Use Future.delayed to avoid calling setState during build
+              Future.delayed(Duration.zero, () {
+                
+                animatedMapMove(points.last, 18.4);
+              });
+            }
             return Stack(
               children: [
                 if (points.length >= 2)
@@ -190,20 +243,6 @@ class _MyHomePageState extends State<MyHomePage> {
                 height: 80,
                 child: GestureDetector(
                   onTap: () {
-                    String convertToDMS(double coordinate, bool isLatitude) {
-                      String direction = isLatitude
-                          ? (coordinate >= 0 ? "N" : "S")
-                          : (coordinate >= 0 ? "E" : "W");
-
-                      coordinate = coordinate.abs();
-                      int degrees = coordinate.floor();
-                      double minutesDecimal = (coordinate - degrees) * 60;
-                      int minutes = minutesDecimal.floor();
-                      int seconds = ((minutesDecimal - minutes) * 60).round();
-
-                      return "$degrees° $minutes' $seconds\" $direction";
-                    }
-
                     showDialog(
                       context: context,
                       builder: (BuildContext context) {
@@ -214,9 +253,9 @@ class _MyHomePageState extends State<MyHomePage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                  'Lat: ${convertToDMS(currentlocation!.latitude, true)}'),
+                                  'Lat: ${currentlocation!.latitude.toString()}'),
                               Text(
-                                  'Lon: ${convertToDMS(currentlocation!.longitude, false)}'),
+                                  'Lon: ${currentlocation!.longitude.toString()}'),
                             ],
                           ),
                           actions: [

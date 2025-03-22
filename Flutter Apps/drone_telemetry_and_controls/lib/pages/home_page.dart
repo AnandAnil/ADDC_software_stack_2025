@@ -13,7 +13,7 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
+class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   LatLng? currentlocation;
   final FirestoreService firestoreService = FirestoreService();
   final MapController mapController = MapController();
@@ -108,18 +108,6 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
     });
   }
 
-  void _goToCurrentLocation() async {
-    Position position = await Geolocator.getCurrentPosition();
-    setState(() {
-      currentlocation = LatLng(position.latitude, position.longitude);
-    });
-    if (currentlocation != null) {
-      double targetZoom =
-          mapController.camera.zoom <= 5.0 ? 17.5 : mapController.camera.zoom;
-      animatedMapMove(currentlocation!, targetZoom);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -129,19 +117,6 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
         mainAxisAlignment: MainAxisAlignment.end,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          FloatingActionButton(
-            onPressed: () async {
-              Position position = await Geolocator.getCurrentPosition();
-              firestoreService.addNote(position.latitude, position.longitude);
-            },
-            tooltip: 'Add Location',
-            child: Icon(Icons.add_rounded),
-          ),
-          FloatingActionButton(
-            onPressed: _goToCurrentLocation,
-            tooltip: 'My Location',
-            child: Icon(Icons.location_pin),
-          ),
           FloatingActionButton(
             onPressed: showDeleteDialog,
             tooltip: "decrement",
@@ -156,7 +131,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
     return FlutterMap(
       mapController: mapController,
       options: MapOptions(
-        initialCenter: LatLng(10.554652,76.2245597),
+        initialCenter: LatLng(10.554652, 76.2245597),
         initialZoom: 5,
         minZoom: 2,
       ),
@@ -174,7 +149,6 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
             if (points.isNotEmpty) {
               // Use Future.delayed to avoid calling setState during build
               Future.delayed(Duration.zero, () {
-                
                 animatedMapMove(points.last, 18.4);
               });
             }
@@ -268,11 +242,6 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
                       },
                     );
                   },
-                  child: const Icon(
-                    SpinDrone.spinDrone,
-                    color: Color.fromARGB(255, 255, 0, 255),
-                    size: 38,
-                  ),
                 ),
               )
             ],

@@ -34,6 +34,7 @@ def add_note_to_firestore(collection_name, latitude, longitude):
 RATE_LIMIT_SECONDS = 5  # Limit data collection/upload to once every 5 seconds
 
 while True:
+    master.wait_heartbeat()
     msg = master.recv_match(type='GLOBAL_POSITION_INT', blocking=True)
     if msg:
         lat = msg.lat / 1e7
@@ -43,4 +44,3 @@ while True:
 
         # Introduce rate-limiting
         time.sleep(RATE_LIMIT_SECONDS)
-print(master.messages.keys())

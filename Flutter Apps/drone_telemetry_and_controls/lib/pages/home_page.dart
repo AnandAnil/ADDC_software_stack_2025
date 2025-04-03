@@ -208,44 +208,6 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
             );
           },
         ),
-        if (currentlocation != null)
-          MarkerLayer(
-            markers: [
-              Marker(
-                point: currentlocation!,
-                width: 80,
-                height: 80,
-                child: GestureDetector(
-                  onTap: () {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: const Text('Current Location'),
-                          content: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                  'Lat: ${currentlocation!.latitude.toString()}'),
-                              Text(
-                                  'Lon: ${currentlocation!.longitude.toString()}'),
-                            ],
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.pop(context),
-                              child: const Text('Close'),
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                  },
-                ),
-              )
-            ],
-          )
       ],
     );
   }

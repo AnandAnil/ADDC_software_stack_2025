@@ -16,4 +16,3 @@ while True:
         lon = msg.lon / 1e7
     
         print(f"Latitude: {lat}, Longitude: {lon}")
-print(master.messages.keys())
